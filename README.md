@@ -22,7 +22,11 @@ And then we download the genome files. (It depends on your internet speed.)
 
     projPath = "/home/yangjiajun/old/cutcfa/"
     load(paste0(projPath, "featurecounts/cut_Anno_df.RData"))
-    
+        
+And then we divided the chromatin into promoter regions and gene body regions.  
+
+![cut%26tag_peak_anno.png](https://github.com/y741269430/homer/blob/main/cut%26tag_peak_anno.png)  
+
     rmdis_bed <- lapply(peakAnno_df[c(1:4,10,11)], function(x){
       x <- x[-grep("Rik$", ignore.case = F, x$SYMBOL),]
       x <- x[grep("Promoter", ignore.case = F, x$annotation), ]
@@ -37,6 +41,8 @@ And then we download the genome files. (It depends on your internet speed.)
                   paste0(projPath, 'homer/', names(rmdis_bed[i]), "_homer.peak"),
                   sep = "\t", row.names = F, col.names = F, quote = F)
     }
+
+![homer_peak_anno.png](https://github.com/y741269430/homer/blob/main/homer_peak_anno.png)  
 
 ## 2.Perform the bash
 
