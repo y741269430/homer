@@ -170,7 +170,7 @@ output_dir=$2
 
 cat filenames | while read i; 
 do
-input_file="$input_dir/${i}_homer.peak"
+input_file="$input_dir/${i}_homer.bed"
 output_file="$output_dir/MotifOutput_${i}/"
 
 nohup findMotifsGenome.pl "$input_file" mm39 "$output_file" -size 200 -mask &
