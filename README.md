@@ -150,6 +150,35 @@ cat filenames | while read i; do
 done
 ```
 
+## 4.homer 预测motif
+
+```bash
+vim h1_homer.sh
+
+#!/bin/bash
+## homer find motif mm39 ##
+
+# 检查是否提供了足够的参数
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <input_directory> <output_directory>"
+    exit 1
+fi
+
+# 获取输入和输出目录路径
+input_dir=$1
+output_dir=$2
+
+cat filenames | while read i; 
+do
+input_file="$input_dir/${i}_homer.peak"
+output_file="$output_dir/MotifOutput_${i}/"
+
+nohup findMotifsGenome.pl "$input_file" mm39 "$output_file" -size 200 -mask &
+
+done
+```
+
+
 ## 9.Peak finding / Differential Peak calling with Replicates (getDifferentialPeaksReplicates.pl)
 ```bash
 nohup getDifferentialPeaksReplicates.pl \
