@@ -121,6 +121,35 @@ nohup cat filenames | while read i; do findPeaks ./homer/${i} -style factor -o a
 nohup cat filenames | while read i; do bed2pos.pl ../macs3/${i}_peaks.narrowPeak > ./${i}/peaks.txt; done &
 ```
 
+## 转换macs3的peak文件为homer的bed文件
+
+```bash
+vim nar2homer.sh
+
+#!/bin/bash
+## narrowPeak to homer ##
+
+# 检查是否提供了足够的参数
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <input_directory> <output_directory>"
+    exit 1
+fi
+
+# 获取输入和输出目录路径
+input_dir=$1
+output_dir=$2
+
+# 读取文件名列表
+cat filenames | while read i; do
+    # 构造输入和输出文件路径
+    input_file="$input_dir/${i}_peaks.narrowPeak"
+    output_file="$output_dir/${i}_homer.bed"
+
+    # 运行 
+    awk -F'\t' '{print $1, $2, $3, $4, $9, $6}' OFS='\t'  "$input_file" > "$output_file" &
+done
+```
+
 ## 9.Peak finding / Differential Peak calling with Replicates (getDifferentialPeaksReplicates.pl)
 ```bash
 nohup getDifferentialPeaksReplicates.pl \
@@ -139,6 +168,7 @@ nohup getDifferentialPeaksReplicates.pl \
 -t SUSP_1/ SUSP_2/ \
 -i CONP_1/ CONP_2/ -genome myMM39 > deg_SUSPvsCONP.csv -all -f 1.5 &
 ```
+
 
 
 
