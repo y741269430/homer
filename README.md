@@ -252,7 +252,7 @@ get_TF_Vennlist <- function(x){
 }
 
 ```
-#### 寻找潜在的转录因子结合区域 ####
+#### 寻找已知的转录因子结合区域 ####
 ```r
 known_find <- list(CON = summaryHomerKnown('MotifOutput_merge_CON/'),
                    Tre = summaryHomerKnown('MotifOutput_merge_Tre/') )
@@ -268,7 +268,7 @@ TF_tre_vs_con <- list(only_con = known_find[[1]][known_find[[1]]$TF %in% a1[[3]]
                       overlap_in_tre = known_find[[2]][known_find[[2]]$TF %in% a1[[1]], ])
 ```
 
-#### 寻找已知的转录因子结合区域 ####
+#### 寻找潜在的转录因子结合区域 ####
 ```r
 homer_find <- list(CON = summaryHomer('MotifOutput_merge_CON/'),
                    Tre = summaryHomer('MotifOutput_merge_Tre/'),)
