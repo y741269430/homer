@@ -178,6 +178,104 @@ nohup findMotifsGenome.pl "$input_file" mm39 "$output_file" -size 200 -mask &
 done
 ```
 
+## 5.R语言统计motif结果
+
+以下是使用的函数
+```r
+subString <- function(strings, idx, sep = NA){
+  
+  strings = as.character(strings)
+  if(is.na(sep)){
+    res = as.character(lapply(strings, function(x) paste(strsplit(x, "")[[1]][idx], collapse = "")))
+  } else{
+    res = sapply(strsplit(strings, sep), function(x) x[idx])
+  }
+  return(res)
+}
+summaryHomer <- function(outFolder){
+  
+  homerFolder = paste0(outFolder, "/homerResults")
+  xFiles = list.files(homerFolder, ".motif$")
+  xFiles = xFiles[-grep("similar", xFiles)]
+  xFiles = xFiles[-grep("RV", xFiles)]
+  xFiles = xFiles[order(as.numeric(gsub("\\.", "", gsub("motif", "", xFiles))))]
+  texts  = sapply(paste0(homerFolder, "/", xFiles), readLines)
+  chunks = sapply(texts, function(x) strsplit(x[1], "[\t]"))
+  
+  motif = sapply(chunks, function(x) subString(x[1], 2, ">"))
+  match = sapply(chunks, function(x) subString(subString(x[2], 2, "BestGuess:"),  1, "/"))
+  score = sapply(chunks, function(x) rev(strsplit(x[2], "[()]")[[1]])[1])
+  count = sapply(chunks, function(x) subString(x[6], 3, "[T:()]"))
+  ratio = sapply(chunks, function(x) subString(x[6], 2, "[()]"))
+  p_value = sapply(chunks, function(x) subString(x[6], 2, "P:"))
+  
+  xresT = data.frame(motif, 
+                     match, 
+                     score = as.numeric(score), 
+                     count = as.numeric(count),
+                     ratio_perc = as.numeric(gsub("%", "", ratio)), 
+                     p_value = as.numeric(p_value)
+  )
+  rownames(xresT) = gsub(".motif", "", basename(rownames(xresT)))
+  return(xresT)
+}
+summaryHomerKnown <- function(outFolder){
+  
+  knownFolder = paste0(outFolder, "/knownResults")
+  xFiles = list.files(knownFolder, ".motif$")
+  xFiles = xFiles[order(as.numeric(gsub("\\.motif", "", gsub("known", "", xFiles))))]
+  texts  = sapply(paste0(knownFolder, "/", xFiles), readLines)
+  chunks = sapply(texts, function(x) strsplit(x[1], "[\t]"))
+  
+  motif = sapply(chunks, function(x) subString(x[1], 2, ">"))
+  TF    = sapply(chunks, function(x) subString(x[2], 1, "/"))
+  count = sapply(chunks, function(x) subString(x[6], 3, "[T:()]"))
+  ratio = sapply(chunks, function(x) subString(x[6], 2, "[()]"))
+  p_value = sapply(chunks, function(x) subString(x[6], 2, "P:"))
+  
+  xresT = data.frame(motif, 
+                     TF, 
+                     count = as.numeric(count),
+                     ratio_perc = as.numeric(gsub("%", "", ratio)), 
+                     p_value = as.numeric(p_value)
+  )
+  rownames(xresT) = gsub("\\.motif", "", basename(rownames(xresT)))
+  return(xresT)
+}
+get_TF_Vennlist <- function(x){
+  
+  inter <- VennDiagram::get.venn.partitions(x)
+  inter$values <- sapply(inter$..values.., paste, collapse = "~")
+  output <- lapply(inter$values, function(x){ x <- unlist(strsplit(x, "~"))})
+  
+  return(output)
+}
+
+```
+#### 寻找潜在的转录因子结合区域 ####
+```r
+known_find <- list(CON = summaryHomerKnown('MotifOutput_merge_CON/'),
+                   Tre = summaryHomerKnown('MotifOutput_merge_Tre/') )
+
+known_find2 <- lapply(known_find, function(x){x <- x$TF })
+ggvenn(known_find2)
+
+# 获取venn图TF集合
+a1 <- get_TF_Vennlist(known_find2[c(1,2)])
+TF_tre_vs_con <- list(only_con = known_find[[1]][known_find[[1]]$TF %in% a1[[3]], ],
+                      overlap_in_con = known_find[[1]][known_find[[1]]$TF %in% a1[[1]], ],
+                      only_tre = known_find[[2]][known_find[[2]]$TF %in% a1[[2]], ],
+                      overlap_in_tre = known_find[[2]][known_find[[2]]$TF %in% a1[[1]], ])
+```
+
+#### 寻找已知的转录因子结合区域 ####
+```r
+homer_find <- list(CON = summaryHomer('MotifOutput_merge_CON/'),
+                   Tre = summaryHomer('MotifOutput_merge_Tre/'),)
+
+homer_find2 <- lapply(homer_find, function(x){x <- x$TF })
+
+```
 
 ## 9.Peak finding / Differential Peak calling with Replicates (getDifferentialPeaksReplicates.pl)
 ```bash
