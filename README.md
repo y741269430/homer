@@ -61,6 +61,8 @@ And then we divided the chromatin into promoter regions and gene body regions.
 ## homer 
 具体流程
 - http://homer.ucsd.edu/homer/ngs/index.html
+- [利用HOMER预测目标序列的motif（从运行程序到结果解读，以及注意事项）](https://www.jianshu.com/p/467d970ec097)    
+
 安装过程
 - http://homer.ucsd.edu/homer/introduction/install.html
 
