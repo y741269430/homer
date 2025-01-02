@@ -152,7 +152,7 @@ cat filenames | while read i; do
 done
 ```
 
-## 4.homer 预测motif
+## 4.1.homer 预测motif
 
 ```bash
 vim h1_homer.sh
@@ -178,6 +178,12 @@ output_file="$output_dir/MotifOutput_${i}/"
 nohup findMotifsGenome.pl "$input_file" mm39 "$output_file" -size 200 -mask &
 
 done
+```
+
+## 4.2.homer 预测motif (RNAseq)
+使用一个csv列表，以基因为列，去除行名列名，放到mouse数据库中，进行motif查找     
+```bash
+findMotifs.pl h.csv mouse MotifOutput/ -rna -len 8 &
 ```
 
 ## 5.R语言统计motif结果
