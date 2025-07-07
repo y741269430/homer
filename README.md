@@ -48,6 +48,8 @@ perl ~/.conda/envs/homer/share/homer/configureHomer.pl -list
 
 ## 2.转换macs3的peak文件为homer的bed文件
 
+这一步之前，应该要先去除blacklist [remove-blacklist](https://github.com/y741269430/ATAC-seq#8remove-blacklist)
+
 ```bash
 vim nar2homer.sh
 
@@ -67,7 +69,8 @@ output_dir=$2
 # 读取文件名列表
 cat filenames | while read i; do
     # 构造输入和输出文件路径
-    input_file="$input_dir/${i}_peaks.narrowPeak"
+    # input_file="$input_dir/${i}_peaks.narrowPeak"
+    input_file="$input_dir/${i}_rmBL.narrowPeak"
     output_file="$output_dir/${i}_homer.bed"
 
     # 运行 
