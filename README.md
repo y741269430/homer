@@ -1,64 +1,7 @@
 # homer
 
-- 0.Build source
-- 1.homer peak files (R)
-- 2.Perform the bash
-
-## 0.Build source  
-
-Firstly, we create conda source to perform homer analysis.  
-
-    conda create -n homer
-    conda activate homer
-    conda install -c bioconda homer
-    ...  
-
-And then we download the genome files. (It depends on your internet speed.)  
-
-    perl /home/yangjiajun/miniconda3/envs/homer/share/homer/.//configureHomer.pl -list
-    perl /home/yangjiajun/miniconda3/envs/homer/share/homer/.//configureHomer.pl -install mm10
-
-## 1.homer peak files (R)  
-
-    projPath = "/home/yangjiajun/old/cutcfa/"
-    load(paste0(projPath, "featurecounts/cut_Anno_df.RData"))
-        
-And then we divided the chromatin into promoter regions and gene body regions.  
-
-![cut%26tag_peak_anno.png](https://github.com/y741269430/homer/blob/main/cut%26tag_peak_anno.png)  
-
-    rmdis_bed <- lapply(peakAnno_df[c(1:4,10,11)], function(x){
-      x <- x[-grep("Rik$", ignore.case = F, x$SYMBOL),]
-      x <- x[grep("Promoter", ignore.case = F, x$annotation), ]
-      x <- x[, c(8,1:3)]
-      x$Strand <- 0
-      colnames(x)[1] <- 'Peak ID'
-      return(x)
-    })
-    
-    for (i in 1:length(rmdis_bed)) {
-      write.table(rmdis_bed[i],
-                  paste0(projPath, 'homer/', names(rmdis_bed[i]), "_homer.peak"),
-                  sep = "\t", row.names = F, col.names = F, quote = F)
-    }
-
-![homer_peak_anno.png](https://github.com/y741269430/homer/blob/main/homer_peak_anno.png)  
-
-## 2.Perform the bash
-
-    vim h1_homer.sh
-  
-    #!/bin/bash
-    ## Alignment to mm10 ##
-  
-    cat filenames | while read i; 
-    do
-    nohup findMotifsGenome.pl ${i}_homer.peak mm10 MotifOutput_${i}/ -size 200 -mask &
-    done
-
 ---
 
-## homer 
 具体流程
 - http://homer.ucsd.edu/homer/ngs/index.html
 - [利用HOMER预测目标序列的motif（从运行程序到结果解读，以及注意事项）](https://www.jianshu.com/p/467d970ec097)    
@@ -69,7 +12,7 @@ And then we divided the chromatin into promoter regions and gene body regions.
 方法参考
 - [Nat Struct Mol Biol 30, 948–957 (2023)](https://www.nature.com/articles/s41594-023-01021-8#Sec15)
 
-
+## 0. 配置环境
 ```bash
 mamba create -n homer
 mamba activate homer 
@@ -77,9 +20,10 @@ mamba install homer
 mamba install wget samtools r-essentials bioconductor-deseq2 bioconductor-edger 
 ```
 
-构建或下载基因组
+## 1. 构建或下载基因组
 - http://homer.ucsd.edu/homer/introduction/configure.html
 
+## 1.1 直接下载构建好的基因组
 ```bash
 
 # 使用该命令查看可供下载的基因组（如果是自己构建的，也可以看的到）
@@ -89,7 +33,7 @@ perl ~/.conda/envs/homer/share/homer/configureHomer.pl -list
 nohup perl ~/.conda/envs/homer/share/homer/configureHomer.pl -install mm39 &
 ```
 
-预先下载mm39，然后自己构建
+## 1.2 预先下载mm39，然后自己构建
 
 ```bash
 loadPromoters.pl -name myMM39-p -org mouse -id refseq -fasta ~/downloads/genome/mm39_GRCm39/ucsc_fa/GRCm39.genome.fa -offset 2000 &
@@ -102,28 +46,7 @@ perl ~/.conda/envs/homer/share/homer/configureHomer.pl -list
 
 创建homer文件夹，并将数据存储在里面
 
-## 2.Creation Tag directories, quality control, and normalization. (makeTagDirectory)
-- http://homer.ucsd.edu/homer/ngs/tagDir.html
-- https://mp.weixin.qq.com/s?src=11&timestamp=1727681189&ver=5537&signature=HcXSefB-Uf3WAeJ3qYE-jtoh59ts2mjCGaob58KwIyjbyxt2uhKCbU3pmbZS8KFiviCvWO2iM*GZ83QcTohGInsEuUwc1vgdwlnTnypBOYeN24QTD2Fn-lqL0oK8BfGz&new=1
-
-```bash
-nohup cat filenames | while read i; do makeTagDirectory ./homer/${i} -genome myMM39 -checkGC ./bam/${i}.last.bam; done
-```
-
-## 3.Peak finding / Transcript detection / Feature identification (findPeaks, getDifferentialPeaksReplicates.pl)
-
-```bash
-nohup cat filenames | while read i; do findPeaks ./homer/${i} -style factor -o auto; done &
-```
-
-## 转换macs3的peak文件为homer文件
-- http://homer.ucsd.edu/homer/ngs/peaks.html
-
-```bash
-nohup cat filenames | while read i; do bed2pos.pl ../macs3/${i}_peaks.narrowPeak > ./${i}/peaks.txt; done &
-```
-
-## 转换macs3的peak文件为homer的bed文件
+## 2.转换macs3的peak文件为homer的bed文件
 
 ```bash
 vim nar2homer.sh
@@ -152,7 +75,7 @@ cat filenames | while read i; do
 done
 ```
 
-## 4.1.homer 预测motif
+## 3.homer 预测motif
 
 ```bash
 vim h1_homer.sh
@@ -180,7 +103,7 @@ nohup findMotifsGenome.pl "$input_file" mm39 "$output_file" -size 200 -mask &
 done
 ```
 
-## 4.2.homer 预测motif (RNAseq)
+## 4.homer 预测motif (RNAseq)
 使用一个csv列表，以基因为列，去除行名列名，放到mouse数据库中，进行motif查找     
 ```bash
 findMotifs.pl h.csv mouse MotifOutput/ -rna -len 8 &
@@ -284,6 +207,31 @@ homer_find <- list(CON = summaryHomer('MotifOutput_merge_CON/'),
 homer_find2 <- lapply(homer_find, function(x){x <- x$TF })
 
 ```
+
+---
+## 不太记得下面的代码是用来做什么的了，之前好像是用homer直接call peak
+
+## 2.Creation Tag directories, quality control, and normalization. (makeTagDirectory)
+- [Creating a "Tag Directory" with makeTagDirectory](http://homer.ucsd.edu/homer/ngs/tagDir.html)
+- https://mp.weixin.qq.com/s?src=11&timestamp=1727681189&ver=5537&signature=HcXSefB-Uf3WAeJ3qYE-jtoh59ts2mjCGaob58KwIyjbyxt2uhKCbU3pmbZS8KFiviCvWO2iM*GZ83QcTohGInsEuUwc1vgdwlnTnypBOYeN24QTD2Fn-lqL0oK8BfGz&new=1
+
+```bash
+nohup cat filenames | while read i; do makeTagDirectory ./homer/${i} -genome myMM39 -checkGC ./bam/${i}.last.bam; done
+```
+
+## 3.Peak finding / Transcript detection / Feature identification (findPeaks, getDifferentialPeaksReplicates.pl)
+
+```bash
+nohup cat filenames | while read i; do findPeaks ./homer/${i} -style factor -o auto; done &
+```
+
+## 转换macs3的peak文件为homer文件
+- http://homer.ucsd.edu/homer/ngs/peaks.html
+
+```bash
+nohup cat filenames | while read i; do bed2pos.pl ../macs3/${i}_peaks.narrowPeak > ./${i}/peaks.txt; done &
+```
+
 
 ## 9.Peak finding / Differential Peak calling with Replicates (getDifferentialPeaksReplicates.pl)
 ```bash
