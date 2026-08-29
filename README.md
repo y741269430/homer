@@ -121,11 +121,11 @@ done
 | Match Score | 匹配得分，通常越接近 1 说明越相似 |
 
 怎么判断：
-先看 `Best Match`，判断 de novo motif 最像哪个已知转录因子。
-`Match Score > 0.9` 时，通常说明这个 de novo motif 和对应已知 motif 非常接近。
-`Match Score` 中等时，可能代表同一家族 motif 的变体。
-如果 de novo 结果和 knownResults 中排名靠前的 motif 彼此一致，通常说明结果更可靠。
-motif 富集结果本身不能单独证明直接结合关系，仍建议结合 peak 注释、功能富集和 IGV 信号综合解释。
+- 先看 `Best Match`，判断 de novo motif 最像哪个已知转录因子。
+-  `Match Score > 0.9` 时，通常说明这个 de novo motif 和对应已知 motif 非常接近。
+- `Match Score` 中等时，可能代表同一家族 motif 的变体。
+- 如果 de novo 结果和 knownResults 中排名靠前的 motif 彼此一致，通常说明结果更可靠。
+- motif 富集结果本身不能单独证明直接结合关系，仍建议结合 peak 注释、功能富集和 IGV 信号综合解释。
 
 二、knownResults.html — 已知 Motif 富集结果    
 
@@ -142,11 +142,10 @@ motif 富集结果本身不能单独证明直接结合关系，仍建议结合 p
 | # / % Background with Motif | 背景序列中包含该 motif 的数量和比例 |
 
 怎么判断：
-`P-value` 越小，说明该已知 motif 在 Peak 中富集越显著。
-`% Target` 明显高于 `% Background`，说明该 motif 更可能在目标 Peak 中特异出现。
-排在最前面的 motif 通常最值得优先关注。
-富集到的转录因子是否合理，最好结合你的细胞类型、靶蛋白和实验背景一起解释。
-
+- `P-value` 越小，说明该已知 motif 在 Peak 中富集越显著。
+- `% Target` 明显高于 `% Background`，说明该 motif 更可能在目标 Peak 中特异出现。
+- 排在最前面的 motif 通常最值得优先关注。
+- 富集到的转录因子是否合理，最好结合你的细胞类型、靶蛋白和实验背景一起解释。
 
 ## 4.homer 预测motif (RNAseq)
 使用一个csv列表，以基因为列，去除行名列名，放到mouse数据库中，进行motif查找     
