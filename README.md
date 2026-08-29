@@ -108,6 +108,7 @@ done
 这里重点展示两类最常用的结果：knownResults.html 和 homerResults.html。
 
 一、homerResults.html — 从头发现的 Motif（De Novo）    
+<img src="https://github.com/y741269430/homer/blob/main/denovo_demo.png" width="800" />    
 
 这个 HTML 展示的是 HOMER 不依赖先验数据库、直接从 Peak 序列里挖掘出来的重复模式。和 knownResults 的区别是：knownResults 是“拿已知 motif 去数据里找”，而 homerResults 是“让数据自己告诉你可能存在什么 motif”。    
 
@@ -128,6 +129,7 @@ done
 - motif 富集结果本身不能单独证明直接结合关系，仍建议结合 peak 注释、功能富集和 IGV 信号综合解释。
 
 二、knownResults.html — 已知 Motif 富集结果    
+<img src="https://github.com/y741269430/homer/blob/main/known_demo.png" width="800" />   
 
 用浏览器打开这个 HTML 文件，可以看到一个表格，展示的是：在你的 Peak 区域中，哪些已知转录因子结合 motif 被显著富集了。HOMER 会把目标 Peak 序列和背景序列进行比较，如果某个已知 motif 在目标序列中出现得明显更多，就说明它被富集了。
 
